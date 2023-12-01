@@ -34,25 +34,34 @@ while True:
     print("line 30", headers)
     filename = headers[0].split()[1]
     print("line 32", filename)
+    
 
+    try:
+        if filename != '/test.html':
+            response400 = 'HTTP/1.0 400 Bad Request\n\n400 Bad Request: Invalid Path'
+            print("line 40", response400)
+            client_connection.sendall(response400.encode())
+            
+            
 
-    if filename == '/test.html':
+        if filename == '/test.html':
 
-        fileRead = open('test.html')
-        content = fileRead.read()
-        fileRead.close()
-        response = 'HTTP/1.0 200 OK\n\n' + content
-        print("line 41", response)
-        client_connection.sendall(response.encode())
-        client_connection.close()
+            fileRead = open('test.html')
+            content = fileRead.read()
+            print("line 44", content)
+            fileRead.close()
+            response = 'HTTP/1.0 200 OK\n\n' + content
+            print("line 49", response)
+            client_connection.sendall(response.encode())
+    except FileNotFoundError:
         
-    else:
-    # Get the content of test.html
-        response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found'
+        response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found'    
+        client_connection.sendall(response.encode())
 
 
-    client_connection.sendall(response.encode())
     client_connection.close()
+
+    
 
 # Close socket
 server_socket.close()
