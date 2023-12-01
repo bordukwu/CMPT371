@@ -3,6 +3,10 @@ Implements a simple HTTP/1.0 Server
 
 """
 
+# inspired by:
+# https://www.codementor.io/@joaojonesventura/building-a-basic-http-server-from-scratch-in-python-1cedkg0842
+
+
 import socket
 
 
