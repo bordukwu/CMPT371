@@ -53,6 +53,8 @@ while True:
             response = 'HTTP/1.0 200 OK\n\n' + content
             print("line 49", response)
             client_connection.sendall(response.encode())
+
+            
     except FileNotFoundError:
         
         response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found'    
