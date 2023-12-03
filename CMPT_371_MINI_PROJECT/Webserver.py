@@ -3,11 +3,38 @@ Implements a simple HTTP/1.0 Server
 
 """
 
-# inspired by:
+# http server inspired by:
 # https://www.codementor.io/@joaojonesventura/building-a-basic-http-server-from-scratch-in-python-1cedkg0842
+# password check in console for user input from:
+# https://www.geeksforgeeks.org/getpass-and-getuser-in-python-password-without-echo/
 
 
 import socket
+import getpass
+
+
+
+
+#helper functions
+def send_304_response(client_socket, content):
+    response_headers = [
+        'HTTP/1.1 304 Not Modified',
+        'Cache-Control: no-cache',
+        'Content-Length: 0',
+        # other necessary headers
+        'Connection: close',
+        '',  #the end of the headers
+    ]
+    
+    response = '\r\n'.join(response_headers)
+    response2 = 'HTTP/1.0 304 Not Modified\n\n' + 'HTTP/1.0 304 Not Modified\n\n' + content
+    
+    # client_socket.sendall(response.encode())
+    print("line 80", response)
+    client_socket.sendall(response2.encode())
+    # print("line 81", response2)
+
+
 
 
 # Define socket host and port
@@ -21,6 +48,12 @@ server_socket.bind((SERVER_HOST, SERVER_PORT))
 server_socket.listen(1)
 print('Listening on port %s ...' % SERVER_PORT)
 
+send_304 = False
+content = ""
+validPass = ""
+validPassFlag = False
+
+
 while True:    
     # Wait for client connections
     client_connection, client_address = server_socket.accept()
@@ -28,93 +61,85 @@ while True:
     # Get the client request
     request = client_connection.recv(1024).decode()
     print(request)
+    if request:
+        request_lines = request.split('\r\n')
+        request_headers = {}
+
+        # Extracting headers from request
+        for line in request_lines[1:]:
+            if not line.strip():
+                break
+            header_name, header_value = line.split(': ')
+            request_headers[header_name.lower()] = header_value
+
+        # Check Content-Length header
+        content_length = request_headers.get('content-length')
+        if content_length:
+            print(f"Content-Length header present: {content_length} bytes")
+        else:
+            print("'HTTP/1.1 411 Length required'")
+
+
 
     # Parse HTTP headers
     headers = request.split('\n')
-    print("line 30", headers)
+    # print("line 30", headers)
     filename = headers[0].split()[1]
-    print("line 32", filename)
-    
+    # print("line 32", filename)
 
-    try:
-        if filename != '/test.html':
-            response400 = 'HTTP/1.0 400 Bad Request\n\n400 Bad Request: Invalid Path'
-            print("line 40", response400)
-            client_connection.sendall(response400.encode())
-            
-            
 
-        if filename == '/test.html':
+    if validPassFlag == False:
 
-            fileRead = open('test.html')
-            content = fileRead.read()
-            print("line 44", content)
-            fileRead.close()
-            response = 'HTTP/1.0 200 OK\n\n' + content
-            print("line 49", response)
+        validPass = getpass.getpass(prompt='Enter password: ')
+        print("line 13", validPass)
+
+
+        if validPass.lower() != 'password' :
+
+            response = 'HTTP/1.0 403 Forbidden\n\n403 Forbidden - Invalid Password'
             client_connection.sendall(response.encode())
+        elif validPass.lower() == 'password':
+            validPassFlag = True
 
-            
-    except FileNotFoundError:
+    else:
         
-        response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found'    
-        client_connection.sendall(response.encode())
+        try:
+            if filename != '/test.html':
+                response400 = 'HTTP/1.0 400 Bad Request\n\n400 Bad Request: Invalid Path'
+                print("line 40", response400)
+                client_connection.sendall(response400.encode())
+                
+            
+            if send_304 == True and filename == '/test.html':
+                send_304_response(client_connection, content)
+
+
+            if send_304 == False and filename == '/test.html':
+
+                fileRead = open('test.html')
+                content = fileRead.read()
+                print("line 44", content)
+                fileRead.close()
+                response = 'HTTP/1.0 200 OK\n\n' + 'HTTP/1.0 200 OK\n\n' + content
+                
+                # print("line 49", response)
+                client_connection.sendall(response.encode())     
+                send_304 = True   
+
+
+
+        except FileNotFoundError:
+            
+            response = 'HTTP/1.0 404 NOT FOUND\n\n404 File Not Found'    
+            client_connection.sendall(response.encode())
 
 
     client_connection.close()
 
     
 
-# Close socket
-server_socket.close()
 
-# import socket
 
-# from handleRequest import handleRequest
 
-# # Define socket host and port
-# SERVER_HOST = "127.0.0.1"
-# SERVER_PORT = 8000
 
-# # create server socket
-# serv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# serv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-# # Bind server socket to loopback newtwork interface
-
-# serv_socket.bind((SERVER_HOST, SERVER_PORT))
-
-# # turn the socket to listening mode - server has a max backlog of 10 connections that are established but not accepted
-# serv_socket.listen(10)
-# print("Listening on port %s ..." % SERVER_PORT)
-
-# while True:
-#     # Accept new Connections in an infinite loop
-#     client_socket, client_addr = serv_socket.accept()
-
-#     print("New connection from", client_addr)
-
-#     chunks = []
-#     while True:
-#         data = client_socket.recv(2048)
-#         if not data:
-#             #client is done with sending 
-#             break 
-#         chunks.append(data)
-
-#     # # Get the client request
-#     # request = client_socket.recv(1024).decode()
-#     # print(request)
-
-#     # # Return an HTTP response
-#     # response = handleRequest(request)
-#     # client_socket.sendall(response.encode())
-
-#     #Echo the client data back to it
-#     client_socket.sendall(b''.join(chunks))
-
-#     # Close connection
-#     client_socket.close()
-
-# # Close socket
-# serv_socket.close()
