@@ -110,11 +110,11 @@ while True:
                 client_connection.sendall(response400.encode())
                 
             
-            if send_304 == True and filename == '/test.html':
+            elif send_304 == True and filename == '/test.html':
                 send_304_response(client_connection, content)
 
 
-            if send_304 == False and filename == '/test.html':
+            elif send_304 == False and filename == '/test.html':
 
                 fileRead = open('test.html')
                 content = fileRead.read()
