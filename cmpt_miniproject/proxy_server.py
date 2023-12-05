@@ -18,6 +18,7 @@ print('Proxy server listening on port %s ...' % PROXY_PORT)
 
 # Function to forward the request to the destination web server
 def forward_request(request):
+    print("forwarding request to proxy server for processing")
     # Create a socket to communicate with the destination web server
     web_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     web_server_socket.connect((WEB_SERVER_HOST, WEB_SERVER_PORT))
