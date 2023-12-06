@@ -60,7 +60,7 @@ while True:
 
     # Get the client request
     request = client_connection.recv(1024).decode()
-    print(request)
+    print("line 63", request)
     if request:
         request_lines = request.split('\r\n')
         request_headers = {}
@@ -75,9 +75,11 @@ while True:
         # Check Content-Length header
         content_length = request_headers.get('content-length')
         if content_length:
-            print(f"Content-Length header present: {content_length} bytes")
+            print(f"line 78, Content-Length header present: {content_length} bytes")
         else:
-            print("'HTTP/1.1 411 Length required'")
+            content_length_response = "'HTTP/1.1\n\n 411 Length required'"
+            print("line 87 'HTTP/1.1 411 Length required'")
+            client_connection.sendall(content_length_response.encode())
 
 
 
@@ -85,7 +87,7 @@ while True:
     headers = request.split('\n')
     # print("line 30", headers)
     filename = headers[0].split()[1]
-    # print("line 32", filename)
+    print("line 32", filename)
 
 
     if validPassFlag == False:
@@ -118,7 +120,7 @@ while True:
 
                 fileRead = open('test.html')
                 content = fileRead.read()
-                print("line 44", content)
+                # print("line 44", content)
                 fileRead.close()
                 response = 'HTTP/1.0 200 OK\n\n' + 'HTTP/1.0 200 OK\n\n' + content
                 

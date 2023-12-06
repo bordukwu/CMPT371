@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 
 <head>
@@ -17,4 +17,73 @@
 </body>
 
 </html>
+-->
 
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>HTTP Requests to Python Server</title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+  <p>Congratulations! Your Web Server is Working!</p>
+
+  <!-- Buttons to send requests -->
+  <button onclick="sendPostRequest()">Send POST Request</button>
+  <button onclick="sendGetRequest()">Send GET Request</button>
+
+  <!-- JavaScript to send HTTP requests -->
+  <script>
+    function sendPostRequest() {
+      var url = '/test.html'; // Endpoint for both GET and POST requests
+      var postData = JSON.stringify({ message: 'Hello, server! POST' }); // Data to send for POST
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: postData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('POST Request - Server response:', data);
+      })
+      .catch(error => {
+        console.error('There was a problem with the POST fetch operation:', error);
+      });
+    }
+
+    function sendGetRequest() {
+      var url = '/test.html'; // Endpoint for both GET and POST requests
+
+      fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('GET Request - Server response:', data);
+      })
+      .catch(error => {
+        console.error('There was a problem with the GET fetch operation:', error);
+      });
+    }
+  </script>
+</body>
+
+</html>
